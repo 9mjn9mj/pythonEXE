@@ -1,9 +1,11 @@
-# main.py
 import sys
 import requests
 import threading
 import time
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton
+from PyInstaller.utils.hooks import collect_submodules
+
+hiddenimports = collect_submodules('requests')  # PyInstaller에서 requests 모듈 포함
 
 class MyApp(QWidget):
     def __init__(self):
