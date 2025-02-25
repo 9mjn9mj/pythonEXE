@@ -28,11 +28,12 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # ✅ requests 자동 설치
+          pip install -r requirements.txt
+          pip install pyinstaller  # ✅ pyinstaller 설치
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --windowed --hidden-import=requests main.py
+          python -m PyInstaller --onefile --windowed --hidden-import=requests main.py  # ✅ python -m PyInstaller 사용
 
       - name: Upload EXE as Artifact
         uses: actions/upload-artifact@v4
