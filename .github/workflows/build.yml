@@ -8,9 +8,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 permissions: 
-  contents: write  # ✅ push 권한 부여 (태그 생성 가능)
-  
+  contents: write  # ✅ push 권한 추가
+
 jobs:
   build:
     runs-on: windows-latest
@@ -27,11 +28,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller PyQt5
+          pip install -r requirements.txt  # ✅ requests 자동 설치
 
       - name: Build EXE
         run: |
-          pyinstaller --onefile --windowed main.py
+          pyinstaller --onefile --windowed --hidden-import=requests main.py
 
       - name: Upload EXE as Artifact
         uses: actions/upload-artifact@v4
@@ -54,26 +55,9 @@ jobs:
           name: python-app
           path: dist
 
-      - name: Get Latest Tag
-        id: get_tag
-        run: |
-          latest_tag=$(git tag --sort=-v:refname | head -n 1)
-          if [ -z "$latest_tag" ]; then
-            new_tag="v1.0.0"
-          else
-            new_tag=$(echo $latest_tag | awk -F. -v OFS=. '{$NF += 1 ; print}')
-          fi
-          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
-
-      - name: Create New Tag
-        run: |
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.NEW_TAG }}
           files: dist/main.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
