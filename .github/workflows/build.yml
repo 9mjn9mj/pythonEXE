@@ -50,6 +50,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set Release Tag  # ✅ 태그 자동 생성
+        id: set_tag
+        run: |
+          NEW_TAG="v1.0.$(date +%s)"  # 현재 시간을 기반으로 새로운 태그 생성
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
       - name: Download EXE Artifact
         uses: actions/download-artifact@v4
         with:
@@ -59,6 +67,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ env.NEW_TAG }}  # ✅ 자동 생성된 태그 사용
           files: dist/main.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
